@@ -6,7 +6,7 @@ import operator
 import subprocess
 import easyocr
 
-size = 9
+size = 16
 margin = 4
 cell_size = 28 + 2 * margin
 grid_size = size * cell_size
@@ -289,20 +289,20 @@ def capture_image_from_camera():
 
 if __name__ == "__main__":
     while True:
-        if os.path.exists("output.jpg"):
-            os.remove("output.jpg")
-        if os.path.exists("grid.txt"):
-            os.remove("grid.txt")
-        if os.path.exists("grid_output.txt"):
-            os.remove("grid_output.txt")
-        if os.path.exists("dancingLinks.exe"):
-            os.remove("dancingLinks.exe")
-        if os.path.exists("captured_image.jpg"):
-            os.remove("captured_image.jpg")
-        if os.path.exists("cells"):
-            for file in os.listdir("cells"):
-                os.remove(f"cells\{file}")
-            os.rmdir("cells")
+        # if os.path.exists("output.jpg"):
+        #     os.remove("output.jpg")
+        # if os.path.exists("grid.txt"):
+        #     os.remove("grid.txt")
+        # if os.path.exists("grid_output.txt"):
+        #     os.remove("grid_output.txt")
+        # if os.path.exists("dancingLinks.exe"):
+        #     os.remove("dancingLinks.exe")
+        # if os.path.exists("captured_image.jpg"):
+        #     os.remove("captured_image.jpg")
+        # if os.path.exists("cells"):
+        #     for file in os.listdir("cells"):
+        #         os.remove(f"cells\{file}")
+        #     os.rmdir("cells")
 
         print("Select an option:")
         print("1. Select Image from files")

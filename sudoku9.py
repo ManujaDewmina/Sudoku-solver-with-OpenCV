@@ -1,6 +1,5 @@
 import os
 import cv2
-import re
 import numpy as np
 import operator
 import subprocess
@@ -15,10 +14,12 @@ classifier = load_model("./digit_model.h5")
 
 # Function to convert the image to a binary image
 def binary_image(img):
+    # Convert the image to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # Apply Gaussian blur to the image to remove noise
     gray = cv2.GaussianBlur(gray, (7, 7), 0)
+    # Apply adaptive thresholding to get a binary image
     thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 9, 2)
-
     return thresh
 
 # Function to find the grid contour
@@ -77,7 +78,7 @@ def get_cell_value( grid, sudoku_grid_unsolved):
             x2min = x * cell_size + margin
             x2max = (x + 1) * cell_size - margin
             img = grid[y2min:y2max, x2min:x2max]
-            
+            cv2.imwrite(f"cells\cell_{y}_{x}.jpg", img)
             # Resize the image to 28x28
             img = cv2.resize(img, (28, 28))
 
@@ -142,8 +143,9 @@ def run_solver(sudoku_grid_solved):
 
     return sudoku_grid_solved
 
+# Function to overlay the solved numbers on the original image
 def overlay_grid(frame, pts1, pts2, sudoku_grid_solved, sudoku_grid_unsolved):
-    fond = np.zeros(shape=(grid_size, grid_size, 3), dtype=np.float32)
+    copy_img = np.zeros(shape=(grid_size, grid_size, 3), dtype=np.float32)
 
     # Iterate through the cells in the solved puzzle array and overlay the numbers on the photo
     font = cv2.FONT_HERSHEY_SIMPLEX
@@ -158,18 +160,18 @@ def overlay_grid(frame, pts1, pts2, sudoku_grid_solved, sudoku_grid_unsolved):
                 y_position = i * cell_size + cell_size // 2 + 12
 
                 # Overlay the solved number only inside the puzzle area
-                cv2.putText(fond, str(sudoku_grid_solved[i][j]), (x_position, y_position),
+                cv2.putText(copy_img, str(sudoku_grid_solved[i][j]), (x_position, y_position),
                             font, font_scale, (0, 0, 255), font_thickness)
 
     M = cv2.getPerspectiveTransform(pts2, pts1)
     h, w, c = frame.shape
-    fondP = cv2.warpPerspective(fond, M, (w, h))
-    img2gray = cv2.cvtColor(fondP, cv2.COLOR_BGR2GRAY)
+    copy_img_p = cv2.warpPerspective(copy_img, M, (w, h))
+    img2gray = cv2.cvtColor(copy_img_p, cv2.COLOR_BGR2GRAY)
     ret, mask = cv2.threshold(img2gray, 10, 255, cv2.THRESH_BINARY)
     mask = mask.astype('uint8')
     mask_inv = cv2.bitwise_not(mask)
     img1_bg = cv2.bitwise_and(frame, frame, mask=mask_inv)
-    img2_fg = cv2.bitwise_and(fondP, fondP, mask=mask).astype('uint8')
+    img2_fg = cv2.bitwise_and(copy_img_p, copy_img_p, mask=mask).astype('uint8')
     dst = cv2.add(img1_bg, img2_fg)
     dst = cv2.resize(dst, (1080, 620))
     cv2.imshow("output", dst)
