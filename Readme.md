@@ -6,11 +6,7 @@
 Note: Sometimes, errors may occur in the number detection part (OCR) of a 16x16 Sudoku puzzle.
 
 # Demonstration
-<video width="320" height="240" controls autoplay>
-  <source src="https://github.com/ManujaDewmina/Sudoku-Solver-Vision/blob/main/Demo_video.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
 
-
+https://github.com/ManujaDewmina/Sudoku-Solver-Vision/assets/92631934/05a28bf4-bc04-4922-8401-9343551f15d4
 
 Github : https://github.com/ManujaDewmina/Sudoku-Solver-Vision
