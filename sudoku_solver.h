@@ -1,9 +1,12 @@
+// header guards (#ifndef, #define, #endif) to prevent multiple inclusions
+// in the same compilation unit, avoiding issues with duplicate definitions.
 #ifndef SUDOKU_SOLVER_H
 #define SUDOKU_SOLVER_H
 
 #include <iostream>
 #include <string>
 
+// Represents nodes in a toroidal doubly linked list. 
 struct Node {
 	Node *left;
 	Node *right;
@@ -21,4 +24,4 @@ void SolveSudoku_9(int Sudoku[][9], std::string inputFile);
 void PrintGrid_16(int Sudoku[][16]);
 void SolveSudoku_16(int Sudoku[][16], std::string inputFile);
 
-#endif 
+#endif

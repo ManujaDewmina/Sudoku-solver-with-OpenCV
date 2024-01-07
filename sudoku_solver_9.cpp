@@ -14,23 +14,37 @@ using namespace std;
 
 string inputFileN_9;
 
+// The square of the puzzle size
 const int SIZE_SQUARED = SIZE*SIZE;
+// The square root of the puzzle size
 const int SIZE_SQRT = sqrt((double)SIZE);
+// The number of columns in the exact cover matrix
 const int ROW_NB = SIZE*SIZE*SIZE;
+// The number of rows in the exact cover matrix
 const int COL_NB = 4 * SIZE*SIZE;
 
+// Node structure for the toroidal doubly linked list
+// An instance of struct Node serving as the header for the linked list
 struct Node Head_9;
+// A pointer to the header node
 struct Node* HeadNode_9 = &Head_9;
+
+// An array of pointers to nodes representing the solution to the Sudoku puzzle
 struct Node* solution_9[MAX_K];
+// An array of pointers to nodes representing the original values present in the Sudoku grid
 struct Node* orig_values_9[MAX_K];
+
+// A 2D array representing the sparse matrix for the exact cover problem
 bool matrix_9[ROW_NB][COL_NB] = { { 0 } };
+// A Boolean flag indicating whether the Sudoku puzzle has been solved
 bool isSolved_9 = false;
+
 void MapSolutionToGrid_9(int Sudoku[][SIZE]);
 void PrintGrid_9(int Sudoku[][SIZE]);
 
 clock_t timer_9, timer2_9;
 
-//DLX functions
+// Updates the linked list to exclude the covered column and its associated nodes
 void coverColumn_9(Node* col) {
 	col->left->right = col->right;
 	col->right->left = col->left;
@@ -43,6 +57,7 @@ void coverColumn_9(Node* col) {
 	}
 }
 
+// Updates the linked list to include the uncovered column and its associated nodes
 void uncoverColumn_9(Node* col) {
 	for (Node* node = col->up; node != col; node = node->up) {
 		for (Node* temp = node->left; temp != node; temp = temp->left) {
@@ -55,8 +70,11 @@ void uncoverColumn_9(Node* col) {
 	col->right->left = col;
 }
 
+// Recursive function to solve the exact cover problem
+// k is the current depth of the search tree
 void search_9(int k) {
 
+	//If the right of the header node points to itself, then we have covered all the columns and found a solution
 	if (HeadNode_9->right == HeadNode_9) {
 		timer2_9 = clock() - timer_9;
 		int Grid[SIZE][SIZE] = { {0} };
@@ -83,22 +101,26 @@ void search_9(int k) {
 		return;
 	}
 
-	//Choose Column Object Deterministically: Choose the column with the smallest Size
+	// Find the column with the smallest size and cover it (choose the column deterministically)
 	Node* Col = HeadNode_9->right;
 	for (Node* temp = Col->right; temp != HeadNode_9; temp = temp->right)
 		if (temp->size < Col->size)
 			Col = temp;
 
+	// Cover the column
 	coverColumn_9(Col);
 
+	// For each row in the column, cover all columns that overlap with the row
 	for (Node* temp = Col->down; temp != Col; temp = temp->down) {
 		solution_9[k] = temp;
 		for (Node* node = temp->right; node != temp; node = node->right) {
 			coverColumn_9(node->head);
 		}
 
+		// Recursively call the search function
 		search_9(k + 1);
 
+		// backtrack and uncover the column
 		temp = solution_9[k];
 		solution_9[k] = NULL;
 		Col = temp->head;
@@ -110,6 +132,7 @@ void search_9(int k) {
 	uncoverColumn_9(Col);
 }
 
+// Map the solution to the grid
 void MapSolutionToGrid_9(int Sudoku[][SIZE]) {
 	for (int i = 0; solution_9[i] != NULL; i++) {
 			Sudoku[solution_9[i]->rowID[1]-1][solution_9[i]->rowID[2]-1] = solution_9[i]->rowID[0];
@@ -119,12 +142,12 @@ void MapSolutionToGrid_9(int Sudoku[][SIZE]) {
 	}
 }
 
-//BUILD THE INITIAL MATRIX CONTAINING ALL POSSIBILITIES
+// Build the sparse matrix representation of the exact cover problem
 void BuildSparseMatrix_9(bool matrix_9[ROW_NB][COL_NB]) {
 
 	//Constraint 1: There can only be one value in any given cell
 	int j = 0, counter = 0;
-	for (int i = 0; i < ROW_NB; i++) { //iterate over all rows
+	for (int i = 0; i < ROW_NB; i++) { 
 		matrix_9[i][j] = 1;
 		counter++;
 		if (counter >= SIZE) {
@@ -178,9 +201,11 @@ void BuildSparseMatrix_9(bool matrix_9[ROW_NB][COL_NB]) {
 	}
 }
 
-//BUILD A TOROIDAL DOUBLY LINKED LIST OUT OF THE SPARSE MATRIX
+// Build the toroidal doubly linked list representation of the exact cover problem
 void BuildLinkedList_9(bool matrix_9[ROW_NB][COL_NB]) {
 
+	// Create the header node and initialize it to point to itself in all directions and 
+	// set its size to -1 to distinguish it from other Column Nodes
 	Node* header = new Node;
 	header->left = header;
 	header->right = header;
@@ -190,7 +215,7 @@ void BuildLinkedList_9(bool matrix_9[ROW_NB][COL_NB]) {
 	header->head = header;
 	Node* temp = header;
 
-	//Create all Column Nodes
+	// Create all Column Nodes and initialize them to point to the header node in all directions 
 	for (int i = 0; i < COL_NB; i++) {
 		Node* newNode = new Node;
 		newNode->size = 0;
@@ -202,9 +227,10 @@ void BuildLinkedList_9(bool matrix_9[ROW_NB][COL_NB]) {
 		temp->right = newNode;
 		temp = newNode;
 	}
-
+	
 	int ID[3] = { 0,1,1 };
-	//Add a Node for each 1 present in the sparse matrix_9 and update Column Nodes accordingly
+	// Create all Row Nodes and initialize them to point to the Column Node they belong to in the head pointer
+	// and to themselves in all other directions
 	for (int i = 0; i < ROW_NB; i++) {
 		Node* top = header->right;
 		Node* prev = NULL;
@@ -222,6 +248,7 @@ void BuildLinkedList_9(bool matrix_9[ROW_NB][COL_NB]) {
 			ID[0]++;
 		}
 
+		// Create the Row Node and initialize it to point to the Column Node it belongs to in the head pointer
 		for (int j = 0; j < COL_NB; j++, top = top->right) {
 			if (matrix_9[i][j]) {
 				Node* newNode = new Node;
@@ -251,22 +278,27 @@ void BuildLinkedList_9(bool matrix_9[ROW_NB][COL_NB]) {
 	HeadNode_9 = header;
 }
 
-//COVERS VALUES THAT ARE ALREADY PRESENT IN THE GRID
+// Cover values that are already present in the grid
 void TransformListToCurrentGrid_9(int Puzzle[][SIZE]) {
 	int index = 0;
 	for(int i = 0 ; i<SIZE; i++ )
 		for(int j = 0 ; j<SIZE; j++)
+		// If the cell is not empty, cover the corresponding row
 			if (Puzzle[i][j] > 0) {
 				Node* Col = NULL;
 				Node* temp = NULL;
+				// Find the column that corresponds to the cell
 				for (Col = HeadNode_9->right; Col != HeadNode_9; Col = Col->right) {
 					for (temp = Col->down; temp != Col; temp = temp->down)
 						if (temp->rowID[0] == Puzzle[i][j] && (temp->rowID[1] - 1) == i && (temp->rowID[2] - 1) == j)
 							goto ExitLoops;
 				}
+				// Cover the column
 ExitLoops:		coverColumn_9(Col);
+				// Add the node to the array of original values
 				orig_values_9[index] = temp;
 				index++;
+				// Cover all columns that overlap with the row
 				for (Node* node = temp->right; node != temp; node = node->right) {
 					coverColumn_9(node->head);
 				}
@@ -274,18 +306,26 @@ ExitLoops:		coverColumn_9(Col);
 }
 
 void SolveSudoku_9(int Sudoku[][SIZE], string inputFileName) {
+	// start timer
 	timer_9 = clock();
 	//Functions to turn a Sudoku grid into an Exact Cover problem
 	BuildSparseMatrix_9(matrix_9);
+	// Build the toroidal doubly linked list
 	BuildLinkedList_9(matrix_9);
+	// Cover values that are already present in the grid
 	TransformListToCurrentGrid_9(Sudoku);
+
 	inputFileN_9 = inputFileName;
+
+	// Solve the Exact Cover problem
 	search_9(0);
+
 	if (!isSolved_9)
 		cout << "No Solution!" << endl;
 	isSolved_9 = false;
 }
 
+// Print the grid
 void PrintGrid_9(int Sudoku[][SIZE]){
 	string extBorder = "+", intBorder = "|";
 	int counter = 1;

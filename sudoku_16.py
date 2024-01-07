@@ -159,8 +159,8 @@ def overlay_grid(frame, pts1, pts2, sudoku_grid_solved, sudoku_grid_unsolved):
 
     # Iterate through the cells in the solved puzzle array and overlay the numbers on the photo
     font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 1
-    font_thickness = 2
+    font_scale = 0.5
+    font_thickness = 0
 
     for i in range(size):
         for j in range(size):
