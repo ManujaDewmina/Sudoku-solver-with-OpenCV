@@ -22,4 +22,4 @@ Note: Sometimes, errors may occur in the number detection part (OCR) of a 16x16 
 
 ## Demonstration
 
-![video](https://github.com/ManujaDewmina/Sudoku-solver-with-OpenCV/blob/0e1a2182f8dba2cb8793df21980d147aae3421d3/Demonstration/Video_demonstration.mp4)
+https://github.com/ManujaDewmina/Sudoku-solver-with-OpenCV/blob/9069a0a8195ea25cbf4042f8dcb95ba8915b6eb0/Demonstration/Video_demonstration.mp4
