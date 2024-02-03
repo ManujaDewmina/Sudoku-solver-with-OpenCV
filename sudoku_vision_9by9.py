@@ -10,7 +10,7 @@ margin = 4
 cell_size = 28 + 2 * margin
 grid_size = size * cell_size
 
-classifier = load_model("./digit_model.h5")
+classifier = load_model("Model/digit_model.h5")
 
 # Function to convert the image to a binary image
 def binary_image(img):
