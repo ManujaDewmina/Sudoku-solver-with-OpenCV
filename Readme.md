@@ -8,7 +8,7 @@ The synergy between computer vision and algorithmic optimization enhances digit 
 
 ## Example
 
-| Captured Image         | Solved puzzle          |
+| Captured Image         | Solved Puzzle          |
 | ---------------------- | ---------------------- |
 | ![image](https://github.com/ManujaDewmina/Sudoku-solver-with-OpenCV/blob/0e1a2182f8dba2cb8793df21980d147aae3421d3/Images/Solved/capture.jpg) | ![image](https://github.com/ManujaDewmina/Sudoku-solver-with-OpenCV/blob/0e1a2182f8dba2cb8793df21980d147aae3421d3/Images/Solved/answer.jpg) |
 
@@ -22,4 +22,4 @@ Note: Sometimes, errors may occur in the number detection part (OCR) of a 16x16 
 
 ## Demonstration
 
-https://github.com/ManujaDewmina/Sudoku-solver-with-OpenCV/blob/0e1a2182f8dba2cb8793df21980d147aae3421d3/Demonstration/Video_demonstration.mp4
+![video](https://github.com/ManujaDewmina/Sudoku-solver-with-OpenCV/blob/0e1a2182f8dba2cb8793df21980d147aae3421d3/Demonstration/Video_demonstration.mp4)
